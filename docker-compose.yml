@@ -1,0 +1,41 @@
+version: "3"
+services:
+  php:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    volumes:
+      - ./:/var/www
+    ports:
+      - 9811:80
+
+  db:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    environment:
+      MYSQL_DATABASE: cakephp4_tests
+      MYSQL_USER: user
+      MYSQL_PASSWORD: 8745
+      MYSQL_ROOT_PASSWORD: 8745
+      TZ: "Asia/Tokyo"
+    ports:
+      - 9821:3306
+    restart: always
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=db
+      - PMA_USER=root
+      - PMA_PASSWORD=8745
+    links:
+      - db
+    ports:
+      - 9831:80
+    volumes:
+      - ./docker/phpmyadmin/sessions:/sessions
